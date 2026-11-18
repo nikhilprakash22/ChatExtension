@@ -8,9 +8,11 @@
  *   context, and returns to a blank page with no extension loaded.
  *
  *   Strategy:
- *     1. acquireTokenSilent  — always tried first (no UI, instant)
- *     2. acquireTokenPopup   — fallback when silent fails (small popup window,
- *                              auth completes there, SharePoint page stays intact)
+ *     1. acquireTokenSilent  — from the in-memory cache (no UI, instant)
+ *     2. ssoSilent           — reuses the user's existing Microsoft sign-in
+ *                              in a hidden frame (no UI)          // FIX
+ *     3. acquireTokenPopup   — only when 1 and 2 fail (small popup window,
+ *                              SharePoint page stays intact)
  *
  * Scope: https://api.powerplatform.com/CopilotStudio.Copilots.Invoke
  *
@@ -21,7 +23,11 @@
  *       https://<tenant>.sharepoint.com/_layouts/15/workbench.aspx     (workbench)
  *   - API permission: Power Platform API → Delegated → CopilotStudio.Copilots.Invoke
  *
- * SECURITY: Tokens are never logged, stored in localStorage, or exposed to the DOM.
+ * SECURITY:
+ *   - Tokens are kept in memory only (memoryStorage) — never written to
+ *     localStorage, sessionStorage or cookies.                     // FIX
+ *   - Tokens are never logged or exposed to the DOM.
+ *   - MSAL logging is switched off; no personal data is logged.
  */
 
 const COPILOT_INVOKE_SCOPE = 'https://api.powerplatform.com/CopilotStudio.Copilots.Invoke';
@@ -65,9 +71,8 @@ export class AuthService {
       auth: {
         clientId,
         authority: 'https://login.microsoftonline.com/' + tenantId,
-        // Dynamically pick the redirect URI that matches the AAD registration.
+        // Pick the redirect URI that matches the AAD registration.
         // Both URIs must be registered as SPA redirect URIs in AAD.
-        // acquireTokenPopup uses this URI internally for the popup window.
         redirectUri: (function () {
           const origin = window.location.origin;
           const href   = window.location.href.toLowerCase();
@@ -78,13 +83,15 @@ export class AuthService {
           // Production SharePoint pages
           return origin + '/_forms/spfxsinglesignon.aspx';
         }()),
-        // Do NOT navigate back to the original page after login —
-        // we use popup so there is no redirect to return from.
+        // Popup flow only — no redirect to return from.
         navigateToLoginRequestUrl: false,
       },
       cache: {
-        // sessionStorage — scoped to the browser tab, never persisted across sessions
-        cacheLocation: 'sessionStorage',
+        // FIX: tokens in memory only — gone when the page closes or reloads.
+        // Nothing is written to localStorage, sessionStorage or cookies.
+        cacheLocation: 'memoryStorage',
+        // Short-lived sign-in state for the popup (no tokens) is kept per tab.
+        temporaryCacheLocation: 'sessionStorage',
         storeAuthStateInCookie: false,
       },
       system: {
@@ -93,8 +100,6 @@ export class AuthService {
           loggerCallback: function () { /* intentionally empty */ },
           piiLoggingEnabled: false,
         },
-        // Allow the popup to open. Some SP tenant policies block popups —
-        // if that happens the catch below surfaces a clear [ERR-MSAL] message.
         allowNativeBroker: false,
       },
     });
@@ -107,12 +112,11 @@ export class AuthService {
    * Acquire a Copilot Studio invoke token.
    *
    * Flow:
-   *   1. Try silent acquisition (no user interaction, no page navigation).
-   *   2. If silent fails → open a small popup window for interactive consent.
-   *      The popup closes itself after login; the SharePoint page is untouched.
+   *   1. Silent from the in-memory cache.
+   *   2. Silent SSO with the user's existing Microsoft sign-in (no popup).   // FIX
+   *   3. Popup, only if 1 and 2 fail.
    *
-   * NEVER calls acquireTokenRedirect — that would navigate away from SharePoint
-   * and leave a blank page on return.
+   * NEVER calls acquireTokenRedirect.
    *
    * SECURITY: The returned token is used in-memory only — never stored or logged.
    */
@@ -128,7 +132,7 @@ export class AuthService {
       account: accounts && accounts.length > 0 ? accounts[0] : undefined,
     };
 
-    // ── Step 1: Silent acquisition ────────────────────────────────────────────
+    // ── Step 1: Silent acquisition from the in-memory cache ──────────────────
     if (accounts && accounts.length > 0) {
       try {
         const silentResponse = await this._msalInstance.acquireTokenSilent({
@@ -139,26 +143,23 @@ export class AuthService {
         // SECURITY: returned directly to caller — never stored on this class
         return silentResponse.accessToken;
       } catch {
-        // Silent failed — fall through to popup
+        // Silent failed — fall through to SSO
       }
     }
 
-    // ── Step 2: Popup acquisition ─────────────────────────────────────────────
-    // Opens a small Microsoft login popup. The current SharePoint page stays
-    // open and fully functional. The popup closes automatically after login.
+    // ── Step 2 (FIX): Silent SSO with the existing Microsoft sign-in ──────────
+    // The user is already signed in to SharePoint. ssoSilent reuses that
+    // session in a hidden frame — no popup, no user action.
+    try {
+      const ssoResponse = await this._msalInstance.ssoSilent({
+        scopes: [COPILOT_INVOKE_SCOPE],
+      });
+      return ssoResponse.accessToken;
+    } catch {
+      // SSO not possible (e.g. consent needed) — fall through to popup
+    }
+
+    // ── Step 3: Popup acquisition (only when steps 1 and 2 fail) ─────────────
     try {
       const popupResponse = await this._msalInstance.acquireTokenPopup(tokenRequest);
-      return popupResponse.accessToken;
-    } catch (popupErr) {
-      const msg = (popupErr instanceof Error) ? popupErr.message : String(popupErr);
-      // Common causes:
-      //   - Popup blocked by browser → user must allow popups for this site
-      //   - User closed the popup before completing sign-in
-      //   - AAD consent not yet granted for CopilotStudio.Copilots.Invoke
-      throw new Error(
-        '[ERR-MSAL] Popup authentication failed: ' + msg +
-        '. If popups are blocked, allow them for this SharePoint site and try again.'
-      );
-    }
-  }
-}
+      return

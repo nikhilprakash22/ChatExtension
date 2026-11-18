@@ -1,0 +1,211 @@
+
+/* ---------------- Existing Fab & Teaser (keep) ---------------- */
+.rootContainer { position: relative; }
+
+.fab {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 100000;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #0f6cbd;
+  color: #fff;
+  border: none;
+  box-shadow: 0 6px 16px rgba(0,0,0,.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.fabIcon { font-size: 22px; }
+
+.rollTeaser {
+  position: fixed;
+  right: 24px;
+  bottom: 96px;
+  background: #0f6cbd;
+  color: #fff;
+  border-radius: 28px;
+  padding: 12px 18px;
+  transform: translateX(0);
+  transition: transform .6s ease-in-out;
+  box-shadow: 0 6px 16px rgba(0,0,0,.2);
+  z-index: 100000;
+  white-space: nowrap;
+}
+.rollLeft { transform: translateX(-140px); }
+.rollBack { transform: translateX(0); }
+
+/* ---------------- Floating Chat ---------------- */
+.floatingChatWrap {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 100001; /* above fab */
+}
+
+/* FLEX COLUMN: header (auto) → confirm (auto) → body (flex-1) → composer (auto) */
+.floatingChatCard {
+  width: 360px;              /* tweak to taste */
+  height: 520px;             /* tweak to taste; or use clamp for responsive */
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  box-shadow: 0 12px 28px rgba(0,0,0,.18);
+
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;          /* prevent horizontal overflow inside the card */
+}
+
+/* Header */
+.floatingHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-bottom: 1px solid #f0f0f0;
+  background: #fafafa;
+}
+.floatingTitle { font-weight: 600; color: #333; }
+.headerIcons { display: inline-flex; gap: 6px; }
+
+/* Small circular header icons */
+.iconRound :global(.ms-Button-icon) { font-size: 14px; }
+.iconRound {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Confirm 'New chat?' bar (appears just below header) */
+.confirmBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background: #fff9e6;
+  border-bottom: 1px solid #f0e0b0;
+  font-size: 12px;
+  color: #333;
+}
+.confirmActions { display: inline-flex; gap: 6px; }
+.btnTiny,
+.btnTinyPrimary {
+  height: 24px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid #cfcfcf;
+  background: #fff;
+  cursor: pointer;
+  font-size: 12px;
+}
+.btnTinyPrimary {
+  background: #0f6cbd;
+  color: #fff;
+  border-color: #0f6cbd;
+}
+
+/* Body expands and scrolls (messages area) */
+.floatingBody {
+  flex: 1 1 auto;            /* grow/shrink between header and composer */
+  padding: 10px;
+  background: #f5f7fb;
+  overflow-y: auto;           /* vertical scroll for messages */
+}
+
+/* Composer pinned to bottom */
+.floatingComposer {
+  flex: 0 0 auto;            /* do not grow: sits at bottom */
+  display: grid;
+  grid-template-columns: 1fr auto auto; /* input | mic | send */
+  gap: 8px;
+  padding: 8px;
+  border-top: 1px solid #f0f0f0;
+  background: #fff;
+}
+.inputCompact :global(textarea) {
+  min-height: 36px;
+  max-height: 72px;
+}
+
+/* Circular mic and send buttons (compact like screenshot #3) */
+.iconCircle,
+.sendCircle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e0e0e0;
+  background: #fff;
+}
+.iconCircle :global(.ms-Button-icon) { font-size: 16px; }
+
+.sendCircle {
+  background: #e94f4f1a;     /* light red-ish circle */
+  border-color: #e6bcbc;
+}
+.sendCircle :global(.ms-Button-icon) {
+  color: #e94f4f;
+  font-size: 16px;
+}
+.sendCircle:disabled { opacity: .5; }
+
+/* Message bubbles */
+.msgUser {
+  display: flex;
+  justify-content: flex-end;
+  margin: 6px 0;
+}
+.msgBot {
+  display: flex;
+  justify-content: flex-start;
+  margin: 6px 0;
+}
+.msgBubble {
+  max-width: 78%;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid #eaeaea;
+}
+.msgUser .msgBubble {
+  background: #e1f0ff;
+  border-color: #d0e6ff;
+}
+
+/* === Admin panel layout (used by AdminPanel.tsx) === */
+.adminForm {
+  display: grid;
+  gap: 10px;
+}
+.adminActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* -------- Optional enhancements -------- */
+/* Make the card height adapt to viewport; uncomment if desired */
+/*
+.floatingChatCard {
+  height: clamp(420px, 60vh, 560px);
+}
+*/
+
+/* RTL support: move widget to the left in RTL locales */
+/*
+[dir="rtl"] .floatingChatWrap {
+  left: 24px;
+  right: auto;
+}
+*/

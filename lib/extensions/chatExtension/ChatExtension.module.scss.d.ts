@@ -1,0 +1,30 @@
+declare const styles: {
+    rootContainer: string;
+    fab: string;
+    fabIcon: string;
+    rollTeaser: string;
+    rollLeft: string;
+    rollBack: string;
+    floatingChatWrap: string;
+    floatingChatCard: string;
+    floatingHeader: string;
+    floatingTitle: string;
+    headerIcons: string;
+    iconRound: string;
+    confirmBar: string;
+    confirmActions: string;
+    btnTiny: string;
+    btnTinyPrimary: string;
+    floatingBody: string;
+    floatingComposer: string;
+    inputCompact: string;
+    iconCircle: string;
+    sendCircle: string;
+    msgUser: string;
+    msgBot: string;
+    msgBubble: string;
+    adminForm: string;
+    adminActions: string;
+};
+export default styles;
+//# sourceMappingURL=ChatExtension.module.scss.d.ts.map

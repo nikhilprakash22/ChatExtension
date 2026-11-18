@@ -1,0 +1,55 @@
+{
+  "id": "0d3c2807-6d3e-4706-9f7b-c9cde2363a92",
+  "alias": "ChatExtensionApplicationCustomizer",
+  "componentType": "Extension",
+  "extensionType": "ApplicationCustomizer",
+  "version": "0.0.1",
+  "manifestVersion": 2,
+  "requiresCustomScript": false,
+  "supportedHosts": [
+    "SharePointWebPart",
+    "SharePointFullPage"
+  ],
+  "properties": {
+    "hubSiteUrl": "https://leadecservices.sharepoint.com/sites/VISBSharePointTestSite",
+    "configListTitle": "ChatExtensionConfig",
+    "defaultTitleMatch": "Default Settings"
+  },
+  "loaderConfig": {
+    "internalModuleBaseUrls": [
+      "<!-- PATH TO CDN -->"
+    ],
+    "entryModuleId": "chat-extension-application-customizer",
+    "scriptResources": {
+      "chat-extension-application-customizer": {
+        "type": "path",
+        "path": "chat-extension-application-customizer_fd0d697eef90cc4f347b.js"
+      },
+      "@microsoft/decorators": {
+        "type": "component",
+        "id": "f97266fb-ccb7-430e-9384-4124d05295d3",
+        "version": "1.21.1"
+      },
+      "@microsoft/sp-application-base": {
+        "type": "component",
+        "id": "4df9bb86-ab0a-4aab-ab5f-48bf167048fb",
+        "version": "1.21.1"
+      },
+      "react": {
+        "type": "component",
+        "id": "0d910c1c-13b9-4e1c-9aa4-b008c5e42d7d",
+        "version": "17.0.1"
+      },
+      "react-dom": {
+        "type": "component",
+        "id": "aa0a46ec-1505-43cd-a44a-93f3a5aa460a",
+        "version": "17.0.1"
+      },
+      "@microsoft/sp-http": {
+        "type": "component",
+        "id": "c07208f0-ea3b-4c1a-9965-ac1b825211a6",
+        "version": "1.21.1"
+      }
+    }
+  }
+}

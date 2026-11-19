@@ -10,7 +10,7 @@
  *   Strategy:
  *     1. acquireTokenSilent  — from the in-memory cache (no UI, instant)
  *     2. ssoSilent           — reuses the user's existing Microsoft sign-in
- *                              in a hidden frame (no UI)          // FIX
+ *                              in a hidden frame (no UI)
  *     3. acquireTokenPopup   — only when 1 and 2 fail (small popup window,
  *                              SharePoint page stays intact)
  *
@@ -25,7 +25,7 @@
  *
  * SECURITY:
  *   - Tokens are kept in memory only (memoryStorage) — never written to
- *     localStorage, sessionStorage or cookies.                     // FIX
+ *     localStorage, sessionStorage or cookies.
  *   - Tokens are never logged or exposed to the DOM.
  *   - MSAL logging is switched off; no personal data is logged.
  */
@@ -87,7 +87,7 @@ export class AuthService {
         navigateToLoginRequestUrl: false,
       },
       cache: {
-        // FIX: tokens in memory only — gone when the page closes or reloads.
+        // Tokens in memory only — gone when the page closes or reloads.
         // Nothing is written to localStorage, sessionStorage or cookies.
         cacheLocation: 'memoryStorage',
         // Short-lived sign-in state for the popup (no tokens) is kept per tab.
@@ -113,7 +113,7 @@ export class AuthService {
    *
    * Flow:
    *   1. Silent from the in-memory cache.
-   *   2. Silent SSO with the user's existing Microsoft sign-in (no popup).   // FIX
+   *   2. Silent SSO with the user's existing Microsoft sign-in (no popup).
    *   3. Popup, only if 1 and 2 fail.
    *
    * NEVER calls acquireTokenRedirect.
@@ -147,7 +147,7 @@ export class AuthService {
       }
     }
 
-    // ── Step 2 (FIX): Silent SSO with the existing Microsoft sign-in ──────────
+    // ── Step 2: Silent SSO with the existing Microsoft sign-in ───────────────
     // The user is already signed in to SharePoint. ssoSilent reuses that
     // session in a hidden frame — no popup, no user action.
     try {
@@ -162,4 +162,17 @@ export class AuthService {
     // ── Step 3: Popup acquisition (only when steps 1 and 2 fail) ─────────────
     try {
       const popupResponse = await this._msalInstance.acquireTokenPopup(tokenRequest);
-      return
+      return popupResponse.accessToken;
+    } catch (popupErr) {
+      const msg = (popupErr instanceof Error) ? popupErr.message : String(popupErr);
+      // Common causes:
+      //   - Popup blocked by browser → user must allow popups for this site
+      //   - User closed the popup before completing sign-in
+      //   - AAD consent not yet granted for CopilotStudio.Copilots.Invoke
+      throw new Error(
+        '[ERR-MSAL] Popup authentication failed: ' + msg +
+        '. If popups are blocked, allow them for this SharePoint site and try again.'
+      );
+    }
+  }
+}

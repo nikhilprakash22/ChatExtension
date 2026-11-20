@@ -1,1 +1,6 @@
 
+Error: node_modules/source-map-loader/dist/cjs.js??ruleSet[1].rules[6].use!C:/Users/Muthyan/Extension/ChatExtension/lib/extensions/chatExtension/components/ChatWidget.module.scss.js:1:0 - Module not found: Error: Can't resolve './ChatWidget.module.css' in 'C:\Users\Muthyan\Extension\ChatExtension\lib\extensions\chatExtension\components'
+ ---- build encountered an error (0.570s) ---- 
+-------------------- Failed (0.574s) --------------------
+Encountered 1 error
+  [build:webpack] node_modules/source-map-loader/dist/cjs.js??ruleSet[1].rules[6].use!C:/Users/Muthyan/Extension/ChatExtension/lib/extensions/chatExtension/components/ChatWidget.module.scss.js:1:0 - Module not found: Error: Can't resolve './ChatWidget.module.css' in 'C:\Users\Muthyan\Extension\ChatExtension\lib\extensions\chatExtension\components'

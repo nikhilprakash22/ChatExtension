@@ -5,6 +5,10 @@ Error: node_modules/source-map-loader/dist/cjs.js??ruleSet[1].rules[6].use!C:/Us
 Encountered 1 error
   [build:webpack] node_modules/source-map-loader/dist/cjs.js??ruleSet[1].rules[6].use!C:/Users/Muthyan/Extension/ChatExtension/lib/extensions/chatExtension/components/ChatWidget.module.scss.js:1:0 - Module not found: Error: Can't resolve './ChatWidget.module.css' in 'C:\Users\Muthyan\Extension\ChatExtension\lib\extensions\chatExtension\components'
 
+Encountered 2 errors
+  [build:lint] src/extensions/chatExtension/components/AdaptiveCardHost.tsx:51:5 - (react-hooks/exhaustive-deps) Definition for rule 'react-hooks/exhaustive-deps' was not found.
+  [build:lint] src/extensions/chatExtension/components/ChatWidget.tsx:591:5 - (react-hooks/exhaustive-deps) Definition for rule 'react-hooks/exhaustive-deps' was not found.
+
 
 "dependencies": {
     "@azure/msal-browser": "^5.30.0",

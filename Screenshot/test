@@ -9,6 +9,12 @@ Encountered 2 errors
   [build:lint] src/extensions/chatExtension/components/AdaptiveCardHost.tsx:51:5 - (react-hooks/exhaustive-deps) Definition for rule 'react-hooks/exhaustive-deps' was not found.
   [build:lint] src/extensions/chatExtension/components/ChatWidget.tsx:591:5 - (react-hooks/exhaustive-deps) Definition for rule 'react-hooks/exhaustive-deps' was not found.
 
+Encountered 4 warnings
+  [build:lint] src/extensions/chatExtension/models/ILiveUpdate.ts:10:27 - (@rushstack/no-new-null) Usage of "null" is deprecated except when describing legacy APIs; use "undefined" instead
+  [build:lint] src/extensions/chatExtension/services/rbacService.ts:28:55 - (eqeqeq) Expected '!==' and instead saw '!='.
+  [build:lint] src/extensions/chatExtension/services/rbacService.ts:29:56 - (eqeqeq) Expected '!==' and instead saw '!='.
+  [build:lint] src/extensions/chatExtension/services/ChatProxyservices.ts:11:27 - (@rushstack/no-new-null) Usage of "null" is deprecated except when describing legacy APIs; use "undefined" instead
+
 
 "dependencies": {
     "@azure/msal-browser": "^5.30.0",
